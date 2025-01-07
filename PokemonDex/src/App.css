@@ -1,0 +1,8 @@
+body { 
+    padding-top: 100px; 
+    background-image: url('./assets/PokemonBackground.webp');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    margin: 0;
+}
