@@ -4,11 +4,10 @@ import { useState, useEffect } from 'react';
 import { List, ListItem, ListItemText,Typography,Box ,Button,CircularProgress,LinearProgress} from '@mui/material';
 import { styled } from "@mui/material/styles";
 
+
 function Details(){
     const { id } = useParams();
-    const URL = `https://pokeapi.co/api/v2/pokemon/${id}`;
-    const imageURL =`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
-    const DESCURL = `https://pokeapi.co/api/v2/pokemon-species/${id}`;
+    const imageURL = `/pokemon/${id}.png`
     const [pokemon, setPokemon] = useState(null);
     const [desc,setDesc] = useState("No description was found");
     const [moves,setMoves] = useState([]);
@@ -73,7 +72,7 @@ function Details(){
         paddingTop: 15,
       });
 
-      const StatsBar = styled(LinearProgress)(({ value, theme }) => ({
+      const StatsBar = styled(LinearProgress)(({ value}) => ({
         width: '100%',
         height: 15,
         backgroundColor: 'transparent',
@@ -88,33 +87,39 @@ function Details(){
             flex:'1,1,45%',
         });
 
-    useEffect(() => {
-        fetch(URL)
-        .then(response =>{
-            if(!response.ok){
-                throw new Error();
-            }
-            return response.json()
+        useEffect(() => {
+            fetch('/pokemon.json')
+              .then(response => {
+                if (!response.ok) throw new Error();
+                return response.json();
+              })
+              .then(
+                allPokemon => {
+                const current = allPokemon.find(pokemon => pokemon.id === Number(id));
+          
+                if (!current) {
+                  throw new Error("Not found");
+                }
+          
+                setPokemon(current); //pokemon still contains null
+          
+                const learntMoves = current.moves;
+          
+                const levelUpMoves = learntMoves.filter(move =>
+                  move.version_group_details?.some(
+                    version => version.move_learn_method.name === 'level-up'
+                  )
+                );
+          
+                setMoves(levelUpMoves);
+                setStats(current.stats);
+                setAbilities(current.abilities);
+                setTypes(current.types);
         })
-        .then(data => {setPokemon(data);
 
-            const learntMoves = data.moves;
-            
-
-            const levelUpMoves = learntMoves.filter(
-                move => {return move.version_group_details.some(version => version.move_learn_method.name==='level-up')}
-            );
-
-            
-            setMoves(levelUpMoves);
-            setStats(data.stats);
-            setAbilities(data.abilities);
-            setTypes(data.types);
-        }
-    )
         .catch(error => {console.error(error); setError(error.message); setWaiting(false);});
 
-        fetch(DESCURL)
+        fetch('/descriptions.json')
         .then(response =>{
             if(!response.ok){
                 throw new Error("Not found");
@@ -122,7 +127,8 @@ function Details(){
             return response.json()
         })
         .then(data => {
-            const text = data.flavor_text_entries.findLast(entry => entry.language.name === 'en');
+            const text = data.find((desc) => desc.id === Number(id));
+            console.log('Found desc:', text); 
             if(text){
                 setDesc(text.flavor_text);
             }
@@ -197,7 +203,7 @@ function Details(){
 
                             </Box>
 
-                            <Box sx={{ display: 'flex',alignItems: 'center', width: '60%', pr: 2, alignItems: 'center' }}> {/* Contains the stats bars */}
+                            <Box sx={{ display: 'flex',alignItems: 'center', width: '60%', pr: 2, }}> {/* Contains the stats bars */}
                             <StatsBar variant="determinate" value={(val.base_stat / 255) * 100} />
                             </Box> 
 

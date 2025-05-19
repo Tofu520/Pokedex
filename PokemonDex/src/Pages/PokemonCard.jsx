@@ -5,11 +5,9 @@ import {Link} from 'react-router-dom';
 function PokemonCard(props){
     const pokemon = props.pokemon;
     const name = pokemon.name;
-    const url = pokemon.url;
-    const pokemonId = url.split("/")[6];
+    const pokemonId = pokemon.id;
     
-    const imageURL =`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonId}.png`;
-
+    const imageURL = `/pokemon/${pokemonId}.png`
     const CardContainer = styled(Card)({
         border:'none',
         width:150,

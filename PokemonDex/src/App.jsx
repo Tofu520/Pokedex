@@ -5,6 +5,7 @@ import './App.css'
 import Navigation from './Components/Navigation'
 import Details from './Pages/Details'
 
+
 function App() {
 
   const [searchText, setSearchText] = useState('');
@@ -14,14 +15,15 @@ function App() {
   };
   
   return (
-    <Router>
+
+      <Router>
       <Navigation searchText={searchText} onSearchChange={handleSearchChange}/>
       <Routes>
         <Route path="/" element={<Pokemon searchText={searchText}/>} />
         <Route path="/pokemon/:id" element={<Details />} />
       </Routes>
-    </Router>
-   
+    </Router>   
+
   );
 }
 
